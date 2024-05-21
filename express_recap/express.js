@@ -18,7 +18,7 @@ app.use(bodyParser.json()); // allows the express app to read JSON data from req
 const checkMethods = (methods = []) => {
     return (req, res, next) => {
         if (methods.includes(req.method)) return next();
-        else return next({status: 405, message: `Method must be one of ${methods}`});
+        else return next({status: 405, message: `Method must be one of: [${methods.join(", ")}]`});
     }
 }
 
