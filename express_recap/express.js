@@ -15,8 +15,14 @@ const trainers = [
 
 app.use(bodyParser.json()); // allows the express app to read JSON data from request bodies
 
+const checkMethods = (methods = []) => {
+    return (req, res, next) => {
+        if (methods.includes(req.method)) return next();
+        else return next({status: 405, message: `Method must be one of ${methods}`});
+    }
+}
 
-app.get("/hello", (request, response) => {
+app.all("/hello", checkMethods(["GET"]), (request, response) => {
     return response.send("Hello, World!");
 });
 
@@ -34,7 +40,7 @@ app.get("/trainer/get", (req, res) => {
 
 app.get("/trainer/get/:index", (req, res) => { // finds a trainer at a specific index
     const index = req.params.index; // gets the index from the end of the url
-
+    
     return res.json(trainers[index]); // returns the trainer at that index
 });
 
@@ -55,6 +61,10 @@ app.delete("/trainer/delete/:index", (req, res) => {  // removes a trainer at a 
     const removed = trainers.splice(index, 1)[0];
 
     return res.json(removed); // returns the removed trainer (makes it easier to check the request has worked)
+});
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).send(err.message || "Something's wrong");
 });
 
 app.listen(4494, () => console.log("App started"));
